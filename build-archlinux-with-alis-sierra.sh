@@ -186,20 +186,12 @@ Server = https://ant.seedhost.eu/arcolinux/$repo/$arch' | tee -a $buildFolder/ar
 	find $buildFolder/archiso/airootfs/etc/mkinitcpio.conf -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 	echo
 
-
 	echo
 	echo "Git clone ALIS SIERRA"
 	mkdir $buildFolder/archiso/airootfs/alis-sierra
 	git clone https://github.com/ariser-installer/alis-sierra $buildFolder/archiso/airootfs/alis-sierra
 	#mkdir $buildFolder/archiso/airootfs/alis-dev
 	#git clone https://github.com/ariser-installer/alis-dev $buildFolder/archiso/airootfs/alis-dev
-
-	echo
-	echo "Git clone arcolinux-nemesis"
-	mkdir -p $buildFolder/archiso/airootfs/etc/skel
-	mkdir -p $buildFolder/archiso/airootfs/etc/skel/DATA
-	mkdir -p $buildFolder/archiso/airootfs/etc/skel/DATA/arcolinux-nemesis
-	git clone https://github.com/erikdubois/arcolinux-nemesis $buildFolder/archiso/airootfs/etc/skel/DATA/arcolinux-nemesis
 
 echo
 echo "################################################################## "
@@ -212,13 +204,7 @@ echo
 
 	echo
 	echo "Adding more packages to the list"
-	echo "git" | tee -a $buildFolder/archiso/packages.x86_64
-	echo "meld" | tee -a $buildFolder/archiso/packages.x86_64
-	echo "neofetch" | tee -a $buildFolder/archiso/packages.x86_64
-	echo "nano" | tee -a $buildFolder/archiso/packages.x86_64
-	echo "bash-completion" | tee -a $buildFolder/archiso/packages.x86_64
-	echo "firefox" | tee -a $buildFolder/archiso/packages.x86_64
-	
+	echo "git" | tee -a $buildFolder/archiso/packages.x86_64	
 
 echo
 echo "################################################################## "
@@ -263,14 +249,6 @@ echo
 	#FIND='livecd-sound'
 	#REPLACE='  ["/usr/bin/alis-sierra-dev"]="0:0:755"'
 	#find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
-
-	echo "copy get-nemesis-on-sierra"
-	mkdir -p $buildFolder/archiso/airootfs/usr/bin
-	cp get-nemesis-on-sierra $buildFolder/archiso/airootfs/usr/bin
-
-	FIND='livecd-sound'
-	REPLACE='  ["/usr/bin/get-nemesis-on-sierra"]="0:0:755"'
-	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
 #echo
 #echo "################################################################## "
