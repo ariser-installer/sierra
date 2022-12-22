@@ -39,8 +39,8 @@ echo
 
 	# setting of the general parameters
 	archisoRequiredVersion="archiso 68-1"
-	buildFolder=$HOME"/Ariser-build"
-	outFolder=$HOME"/Ariser-Out"
+	buildFolder=$HOME"/Sierra-build"
+	outFolder=$HOME"/Sierra-Out"
 	archisoVersion=$(sudo pacman -Q archiso)
 
 	echo "################################################################## "
@@ -132,7 +132,10 @@ tput setaf 2
 echo "Phase 3 :"
 echo "- Deleting the build folder if one exists"
 echo "- Copying the Archiso folder to build folder"
+echo "- adding arcolinux-repos"
+echo "- mkinitcpio zstd"
 echo "- Cloning ALIS"
+echo "- Arcolinux-Nemesis"
 tput sgr0
 echo "################################################################## "
 echo
@@ -145,11 +148,58 @@ echo
 	mkdir $buildFolder
 	cp -r /usr/share/archiso/configs/releng/ $buildFolder/archiso
 	echo
-	echo "Git clone ALIS + ALIS-DEV"
-	mkdir $buildFolder/archiso/airootfs/alis
-	git clone https://github.com/ariser-installer/alis $buildFolder/archiso/airootfs/alis
-	mkdir $buildFolder/archiso/airootfs/alis-dev
-	git clone https://github.com/ariser-installer/alis-dev $buildFolder/archiso/airootfs/alis-dev
+	echo "adding ArcoLinux repos"
+	echo '
+
+[nemesis_repo]
+SigLevel = Optional TrustedOnly
+Server = https://erikdubois.github.io/$repo/$arch
+
+#[arcolinux_repo_testing]
+#SigLevel = Optional TrustedOnly
+#Server = https://ant.seedhost.eu/arcolinux/$repo/$arch
+
+[arcolinux_repo]
+SigLevel = Optional TrustedOnly
+Server = https://ant.seedhost.eu/arcolinux/$repo/$arch
+
+[arcolinux_repo_3party]
+SigLevel = Optional TrustedOnly
+Server = https://ant.seedhost.eu/arcolinux/$repo/$arch
+
+[arcolinux_repo_xlarge]
+SigLevel = Optional TrustedOnly
+Server = https://ant.seedhost.eu/arcolinux/$repo/$arch' | tee -a $buildFolder/archiso/pacman.conf
+
+
+	echo
+	echo "mkinitcpio xz gone"
+	FIND='COMPRESSION="xz"'
+	REPLACE='#COMPRESSION="xz"'
+	find $buildFolder/archiso/airootfs/etc/mkinitcpio.conf -type f -exec sed -i s/$FIND/$REPLACE/g {} \;
+	echo
+
+	echo
+	echo "mkinitcpio into zstd"
+	FIND='#COMPRESSION="zstd"'
+	REPLACE='COMPRESSION="zstd"'
+	find $buildFolder/archiso/airootfs/etc/mkinitcpio.conf -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
+	echo
+
+
+	echo
+	echo "Git clone ALIS SIERRA"
+	mkdir $buildFolder/archiso/airootfs/alis-sierra
+	git clone https://github.com/ariser-installer/alis-sierra $buildFolder/archiso/airootfs/alis-sierra
+	#mkdir $buildFolder/archiso/airootfs/alis-dev
+	#git clone https://github.com/ariser-installer/alis-dev $buildFolder/archiso/airootfs/alis-dev
+
+	echo
+	echo "Git clone arcolinux-nemesis"
+	mkdir -p $buildFolder/archiso/airootfs/etc/skel
+	mkdir -p $buildFolder/archiso/airootfs/etc/skel/DATA
+	mkdir -p $buildFolder/archiso/airootfs/etc/skel/DATA/arcolinux-nemesis
+	git clone https://github.com/erikdubois/arcolinux-nemesis $buildFolder/archiso/airootfs/etc/skel/DATA/arcolinux-nemesis
 
 echo
 echo "################################################################## "
@@ -163,6 +213,12 @@ echo
 	echo
 	echo "Adding more packages to the list"
 	echo "git" | tee -a $buildFolder/archiso/packages.x86_64
+	echo "meld" | tee -a $buildFolder/archiso/packages.x86_64
+	echo "neofetch" | tee -a $buildFolder/archiso/packages.x86_64
+	echo "nano" | tee -a $buildFolder/archiso/packages.x86_64
+	echo "bash-completion" | tee -a $buildFolder/archiso/packages.x86_64
+	echo "firefox" | tee -a $buildFolder/archiso/packages.x86_64
+	
 
 echo
 echo "################################################################## "
@@ -182,32 +238,39 @@ echo
 	echo "Arch Linux iso build on : "$date_build | tee -a $buildFolder/archiso/airootfs/etc/dev-rel
 
 	FIND='livecd-sound'
-	REPLACE='  ["/alis/start.sh"]="0:0:755"'
+	REPLACE='  ["/alis-sierra/start.sh"]="0:0:755"'
 	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
-	FIND='livecd-sound'
-	REPLACE='  ["/alis-dev/start.sh"]="0:0:755"'
-	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
+	#FIND='livecd-sound'
+	#REPLACE='  ["/alis-sierra-dev/start.sh"]="0:0:755"'
+	#find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
 	echo "copy nanorc"
 	cp nanorc 	$buildFolder/archiso/airootfs/etc/nanorc
 
-	echo "copy alis"
+	echo "copy alis-sierra"
 	mkdir -p $buildFolder/archiso/airootfs/usr/bin
-	cp alis 	$buildFolder/archiso/airootfs/usr/bin
+	cp alis-sierra 	$buildFolder/archiso/airootfs/usr/bin
 
 	FIND='livecd-sound'
-	REPLACE='  ["/usr/bin/alis"]="0:0:755"'
+	REPLACE='  ["/usr/bin/alis-sierra"]="0:0:755"'
 	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
-	echo "copy alis-dev"
+	#echo "copy alis-sierra-dev"
+	#mkdir -p $buildFolder/archiso/airootfs/usr/bin
+	#cp alis-sierra-dev 	$buildFolder/archiso/airootfs/usr/bin	
+
+	#FIND='livecd-sound'
+	#REPLACE='  ["/usr/bin/alis-sierra-dev"]="0:0:755"'
+	#find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
+
+	echo "copy get-nemesis-on-sierra"
 	mkdir -p $buildFolder/archiso/airootfs/usr/bin
-	cp alis-dev 	$buildFolder/archiso/airootfs/usr/bin	
+	cp get-nemesis-on-sierra $buildFolder/archiso/airootfs/usr/bin
 
 	FIND='livecd-sound'
-	REPLACE='  ["/usr/bin/alis-dev"]="0:0:755"'
+	REPLACE='  ["/usr/bin/get-nemesis-on-sierra"]="0:0:755"'
 	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
-
 
 #echo
 #echo "################################################################## "
