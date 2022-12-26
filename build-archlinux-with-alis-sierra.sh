@@ -223,16 +223,9 @@ echo
 	touch $buildFolder/archiso/airootfs/etc/dev-rel
 	echo "Arch Linux iso build on : "$date_build | tee -a $buildFolder/archiso/airootfs/etc/dev-rel
 
-	FIND='livecd-sound'
-	REPLACE='  ["/alis-sierra/start.sh"]="0:0:755"'
-	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
-
-	#FIND='livecd-sound'
-	#REPLACE='  ["/alis-sierra-dev/start.sh"]="0:0:755"'
-	#find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
-
 	echo "copy nanorc"
 	cp nanorc 	$buildFolder/archiso/airootfs/etc/nanorc
+
 
 	echo "copy alis-sierra"
 	mkdir -p $buildFolder/archiso/airootfs/usr/bin
@@ -242,13 +235,13 @@ echo
 	REPLACE='  ["/usr/bin/alis-sierra"]="0:0:755"'
 	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
-	#echo "copy alis-sierra-dev"
-	#mkdir -p $buildFolder/archiso/airootfs/usr/bin
-	#cp alis-sierra-dev 	$buildFolder/archiso/airootfs/usr/bin	
+	FIND='livecd-sound'
+	REPLACE='  ["/alis-sierra/start.sh"]="0:0:755"'
+	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
-	#FIND='livecd-sound'
-	#REPLACE='  ["/usr/bin/alis-sierra-dev"]="0:0:755"'
-	#find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
+	FIND='livecd-sound'
+	REPLACE='  ["/usr/bin/get-nemesis-on-sierra"]="0:0:755"'
+	find $buildFolder/archiso/profiledef.sh -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 
 #echo
 #echo "################################################################## "
