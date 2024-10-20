@@ -225,6 +225,10 @@ echo
 	find $buildFolder/archiso/airootfs/etc/mkinitcpio.conf -type f -exec sed -i "/$FIND/a $REPLACE" {} \;
 	echo
 
+	FIND='DownloadUser = alpm'
+	REPLACE='#DownloadUser = alpm'
+	find $buildFolder/archiso/pacman.conf -type f -exec sed -i "s/$FIND/$REPLACE/g" {} \;
+
 #echo
 #echo "################################################################## "
 #tput setaf 2
